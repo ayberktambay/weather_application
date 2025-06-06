@@ -127,10 +127,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
     }
   }
 
-  void _onCitySelected(City selectedCity) {
-    Navigator.of(context).pop();
-    fetchData(selectedCity.latitude, selectedCity.longitude, cityName: selectedCity.name);
-  }
+ 
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -144,22 +141,32 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      body: Container(
-        decoration: BoxDecoration(gradient: currentGradient),
-        child: _isLoading
-            ? LoaderWidget()
-            : _errorMessage != null
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        _errorMessage!,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.white, fontSize: 18),
-                      ),
-                    ),
-                  )
-                : _buildWeatherDisplay(),
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(gradient: currentGradient),
+              child: _isLoading
+                  ? LoaderWidget()
+                  : _errorMessage != null
+                      ? Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                              _errorMessage!,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.white, fontSize: 18),
+                            ),
+                          ),
+                        )
+                      : RefreshIndicator(
+                        onRefresh: () async {
+                          await _determinePositionAndFetchWeather();
+                        },
+                        child: Expanded(child: _buildWeatherDisplay())),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -182,7 +189,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 10),
+            const SizedBox(height: kTextTabBarHeight),
             const ClockWidget(), 
             const SizedBox(height: 10),
             Text(
