@@ -24,26 +24,22 @@ class MainApp extends ConsumerWidget { // Change to ConsumerWidget
   Widget build(BuildContext context, WidgetRef ref) { 
     LocalJsonLocalization.delegate.directories = ['assets/language'];
     final locale = ref.watch(localeProvider);
-    return  Consumer(
-     builder: (context, ref, _) {
-      return MaterialApp(
-          localizationsDelegates: [
-            LocalJsonLocalization.delegate, 
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-            AppLocalizations.delegate,
-          ],
-          supportedLocales: supportedLocales, 
-          locale: Locale(locale.languageCode), 
-          debugShowCheckedModeBanner: false,
-          home: Builder(
-            builder: (BuildContext builderContext) {
-              return MenuView();
-            },
-          ),
-        );
-      }
-    );
+    return  MaterialApp(
+        localizationsDelegates: [
+          LocalJsonLocalization.delegate, 
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          AppLocalizations.delegate,
+        ],
+        supportedLocales: supportedLocales, 
+        locale: Locale(locale.languageCode), 
+        debugShowCheckedModeBanner: false,
+        home: Builder(
+          builder: (BuildContext builderContext) {
+            return MenuView();
+          },
+        ),
+      );
   }
 }

@@ -7,8 +7,6 @@ import 'package:weather_application/service/app_config_service.dart';
 class WeatherApiService {
   static const String _baseUrl = 'https://api.openweathermap.org/data/2.5/weather';
   final String? _apiKey = AppConfigService().openWeatherApiKey;
-  
-
   Future<CurrentWeatherModel?> getCurrentWeather(double lat,double lon,) async {
     CurrentWeatherModel? weatherData ;
     if (_apiKey == null) {
@@ -29,12 +27,10 @@ class WeatherApiService {
         
         }
         return weatherData;
-      } else {
-        
+      }
+      else {
         if (kDebugMode) {
           print('Failed to load weather data. Status code: ${response.statusCode}');
-        }
-        if (kDebugMode) {
           print('Response body: ${response.body}');
         }
         
@@ -77,8 +73,6 @@ class WeatherApiService {
   }
 
   double? getWindSpeed(CurrentWeatherModel? model) {
-    // Wind speed is often in m/s by default from OpenWeatherMap.
-    // Ensure it's converted to double if it comes as int.
     return (model?.wind?.speed as num?)?.toDouble();
   }
 

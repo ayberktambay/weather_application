@@ -2,13 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle; 
 class AppConfigService {
   static final AppConfigService _instance = AppConfigService._internal();
-
   factory AppConfigService() {
     return _instance;
   }
-
   AppConfigService._internal();
-
   String? _openWeatherApiKey; 
   Future<void> loadConfig() async {
     try {

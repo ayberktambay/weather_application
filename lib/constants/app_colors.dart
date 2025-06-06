@@ -22,7 +22,6 @@ class AppGradients {
     ],
   );
 
-  // Optional: Twilight/Sunset gradient
   static const LinearGradient twilightGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,

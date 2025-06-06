@@ -13,7 +13,6 @@ class BackgroundGradientNotifier extends StateNotifier<LinearGradient> {
   static LinearGradient _getInitialGradient() {
     final now = DateTime.now();
     final hour = now.hour;
-
     if (hour >= 5 && hour < 12) {
       return const LinearGradient(
         colors: [Color(0xFF87CEEB), Color(0xFFADD8E6)],

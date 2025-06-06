@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:localization/localization.dart';
 import 'package:weather_application/providers/language_provider.dart';
 import 'package:weather_application/view/home.dart';
+import 'package:weather_application/view/search.dart';
 import 'package:weather_application/view/settings.dart';
 
 class MenuView extends ConsumerStatefulWidget {
@@ -21,13 +22,18 @@ class _MenuViewState extends ConsumerState<MenuView> {
 
     List<NavItems> navItems = [
       NavItems(0, "Home", const Icon(Icons.home_outlined), const Icon(Icons.home), const HomeView()),
-      NavItems(1, "Settings", const Icon(Icons.settings_outlined), const Icon(Icons.settings), const SettingsView()),
+      NavItems(1, "Search", const Icon(Icons.search_outlined), const Icon(Icons.search), const CityWeatherSearchWidget()),
+      NavItems(2, "Settings", const Icon(Icons.settings_outlined), const Icon(Icons.settings), const SettingsView()),
     ];
 
     return Scaffold(
       body: navItems[currentIndex].path,
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white.withAlpha(50),
+        backgroundColor: const Color.fromARGB(255, 30, 53, 104),
+        selectedItemColor: Colors.white,
+        unselectedItemColor: const Color.fromARGB(255, 113, 138, 150),
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
         items: navItems.map((e) => BottomNavigationBarItem(
           icon: e.disabledIcon!,
           activeIcon: e.activeIcon!,
