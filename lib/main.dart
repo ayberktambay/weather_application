@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:localization/localization.dart';
-import 'package:weather_application/localization/app_localization.dart';
-import 'package:weather_application/providers/language_provider.dart';
-import 'package:weather_application/service/app_config_service.dart';
+import 'package:weather/localization/app_localization.dart';
+import 'package:weather/providers/language_provider.dart';
+import 'package:weather/service/app_config_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:weather_application/view/menu.dart';
+import 'package:weather/view/menu.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

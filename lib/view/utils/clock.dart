@@ -4,7 +4,6 @@ import 'package:localization/localization.dart';
 
 class ClockWidget extends StatefulWidget {
   const ClockWidget({super.key});
-
   @override
   State<ClockWidget> createState() => _ClockWidgetState();
 }
@@ -47,11 +46,11 @@ class _ClockWidgetState extends State<ClockWidget> {
       children: [
         Text(
           time,
-          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
         ),
         Text(
           date,
-          style: const TextStyle(color: Colors.white70, fontSize: 14),
+          style: const TextStyle(color: Colors.white, fontSize: 14,fontWeight: FontWeight.w600),
         ),
       ],
     );

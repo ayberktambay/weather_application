@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.weather_application"
+    namespace = "com.example.weather"
     compileSdk = 35    
     ndkVersion = "27.0.12077973" 
 
@@ -20,7 +20,7 @@ android {
     }
 
      defaultConfig {
-        applicationId = "com.example.weather_application"
+        applicationId = "com.example.weather"
         minSdk = 21
         targetSdk = 35
         versionCode = 1

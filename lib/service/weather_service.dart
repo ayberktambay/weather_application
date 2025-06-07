@@ -1,8 +1,8 @@
 import 'dart:convert'; 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:weather_application/model/current_weather_model.dart'; 
-import 'package:weather_application/service/app_config_service.dart';
+import 'package:weather/model/current_weather_model.dart'; 
+import 'package:weather/service/app_config_service.dart';
 
 class WeatherApiService {
   static const String _baseUrl = 'https://api.openweathermap.org/data/2.5/weather';

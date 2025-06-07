@@ -63,5 +63,8 @@
     "Nov": "Kas",
     "Dec": "Ara",
     "Istanbul (European Side)" : "Istanbul (Avrupa)",
-    "Istanbul (Asian Side)" : "Istanbul (Anadolu)"
+    "Istanbul (Asian Side)" : "Istanbul (Anadolu)",
+    "Latitude": "Enlem",
+    "Longitude": "Boylam",
+    "Location services are disabled. Please enable them." : "Konum servisleri devre dışı,lütfen etkinleştiriniz."
 }

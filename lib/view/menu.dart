@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:localization/localization.dart';
-import 'package:weather_application/providers/language_provider.dart';
-import 'package:weather_application/view/home.dart';
-import 'package:weather_application/view/search.dart';
-import 'package:weather_application/view/settings.dart';
+import 'package:weather/providers/language_provider.dart';
+import 'package:weather/view/home.dart';
+import 'package:weather/view/search.dart';
+import 'package:weather/view/settings.dart';
 
 class MenuView extends ConsumerStatefulWidget {
   const MenuView({super.key});

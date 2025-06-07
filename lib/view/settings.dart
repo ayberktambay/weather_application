@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:localization/localization.dart';
-import 'package:weather_application/providers/language_provider.dart';
+import 'package:weather/providers/language_provider.dart';
 
 class SettingsView extends ConsumerStatefulWidget {
   const SettingsView({super.key});
@@ -13,7 +13,7 @@ class SettingsView extends ConsumerStatefulWidget {
 class _SettingsViewState extends ConsumerState<SettingsView> {
   @override
   Widget build(BuildContext context) {
-    final currentLocale = ref.watch(localeProvider); // her değişimde rebuild
+    ref.watch(localeProvider); // her değişimde rebuild
 
     return Scaffold(
       extendBody: true,

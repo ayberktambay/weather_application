@@ -1,4 +1,4 @@
-name: weather_application
+name: weather
 description: "A new Flutter project."
 publish_to: 'none'
 version: 0.1.0
@@ -14,6 +14,7 @@ dependencies:
   geolocator: ^14.0.1
   flutter_localization: ^0.3.2
   localization:
+  flutter_pagewise: ^2.0.4
   
 dev_dependencies:
   flutter_test:
@@ -25,3 +26,4 @@ flutter:
   assets:
     - key.env
     - assets/language/
+    - assets/weather_icons/

@@ -1,4 +1,4 @@
-import 'package:weather_application/model/city_model.dart';
+import 'package:weather/model/city_model.dart';
 
 final List<City> cities = [
   City(name: 'Istanbul (European Side)', latitude: 41.0082, longitude: 28.9784),

@@ -1,3 +1,3 @@
-# weather_application
+# weather
 
 A weather application created with flutter.

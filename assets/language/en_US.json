@@ -63,5 +63,8 @@
     "Nov": "Nov",
     "Dec": "Dec",
     "Istanbul (European Side)" : "Istanbul (European Side)",
-    "Istanbul (Asian Side)" : "Istanbul (Asian Side)"
+    "Istanbul (Asian Side)" : "Istanbul (Asian Side)",
+    "Latitude": "Latitude",
+    "Longitude": "Longitude",
+    "Location services are disabled. Please enable them." : "Location services are disabled. Please enable them."
 }
