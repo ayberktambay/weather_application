@@ -66,5 +66,13 @@
     "Istanbul (Asian Side)" : "Istanbul (Asian Side)",
     "Latitude": "Latitude",
     "Longitude": "Longitude",
-    "Location services are disabled. Please enable them." : "Location services are disabled. Please enable them."
+    "Location services are disabled. Please enable them." : "Location services are disabled. Please enable them.",
+    "General Settings": "General Settings",
+    "Language": "Language",
+    "Change application language": "Change application language",
+    "About Us": "About Us",
+    "App Information": "App Information",
+    "Version and other information": "Version and other information",
+    "OK": "OK",
+    "Select a language": "Select a language"
 }

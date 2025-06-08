@@ -41,9 +41,8 @@ class _MenuViewState extends ConsumerState<MenuView> {
         )).toList(),
         currentIndex: currentIndex,
         onTap: (value) {
-          setState(() {
-            currentIndex = value;
-          });
+          currentIndex = value;
+          setState(() {});
         },
       ),
     );

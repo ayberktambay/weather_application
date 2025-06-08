@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:localization/localization.dart';
 import 'package:weather/constants/text_styles.dart';
 import 'package:weather/model/city_model.dart';
@@ -28,6 +29,7 @@ class _CityWeatherSearchWidgetState extends State<CityWeatherSearchWidget> {
   int currentPage = 0;
   final int pageSize = 6;
   late ScrollController _scrollController;
+late PagewiseLoadController<City> _pagewiseController;
 
   List<City> get _filteredCities {
     final filtered = query.isEmpty
@@ -39,14 +41,12 @@ class _CityWeatherSearchWidgetState extends State<CityWeatherSearchWidget> {
     return filtered.take((currentPage + 1) * pageSize).toList();
   }
 
-  // Helper function to get asset path based on OpenWeatherMap icon code
   String _getWeatherAssetPath(String iconCode) {
     return 'assets/weather_icons/$iconCode.png';
   }
 
   Future<void> fetchWeatherForCities(List<City> citiesToFetch) async {
     final String apiKey = AppConfigService().openWeatherApiKey!;
-    // Only fetch for cities that haven't been fetched yet
     final List<City> unfetchedCities = citiesToFetch
         .where((city) => !weatherData.containsKey(city.name))
         .toList();
@@ -75,10 +75,8 @@ class _CityWeatherSearchWidgetState extends State<CityWeatherSearchWidget> {
 
   void _loadMore() async {
     if (isLoadingMore || _scrollController.position.maxScrollExtent == _scrollController.position.pixels) {
-      // Prevent multiple calls if already loading or at the very end
       return;
     }
-
     setState(() => isLoadingMore = true);
     currentPage++;
     await fetchWeatherForCities(_filteredCities);
@@ -87,7 +85,7 @@ class _CityWeatherSearchWidgetState extends State<CityWeatherSearchWidget> {
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 10) { // Adjusted threshold
+        _scrollController.position.maxScrollExtent - 100) { 
       _loadMore();
     }
   }
@@ -98,8 +96,14 @@ class _CityWeatherSearchWidgetState extends State<CityWeatherSearchWidget> {
     _scrollController = ScrollController()..addListener(_onScroll);
     isLoading = true;
     fetchWeatherForCities(_filteredCities).then((_) {
-      setState(() => isLoading = false);
+        isLoading = false;
+        _loadMore();
+      setState(() {});  
     });
+    _pagewiseController = PagewiseLoadController<City>(
+  pageSize: pageSize,
+  pageFuture: _getPage,
+);
   }
 
   @override
@@ -108,12 +112,25 @@ class _CityWeatherSearchWidgetState extends State<CityWeatherSearchWidget> {
     _scrollController.dispose();
     super.dispose();
   }
+Future<List<City>> _getPage(int? pageIndex) async {
+  final allFiltered = query.isEmpty
+      ? cities
+      : cities
+          .where((city) => city.name.toLowerCase().contains(query.toLowerCase()))
+          .toList();
 
+  final start = (pageIndex ?? 0) * pageSize;
+  final end = (start + pageSize > allFiltered.length) ? allFiltered.length : start + pageSize;
+
+  final pageCities = allFiltered.sublist(start, end);
+  await fetchWeatherForCities(pageCities);
+
+  return pageCities;
+}
   @override
   Widget build(BuildContext context) {
     var dW = MediaQuery.sizeOf(context).width;
     var dH = MediaQuery.sizeOf(context).height;
-    final visibleCities = _filteredCities;
 
     return Scaffold(
       extendBody: true,
@@ -121,34 +138,49 @@ class _CityWeatherSearchWidgetState extends State<CityWeatherSearchWidget> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Container(
-          decoration: BoxDecoration(
-              border: Border.all(color: Colors.white.withAlpha(50)),
-              color: Colors.black.withAlpha(100),
-              borderRadius: BorderRadius.circular(10)),
-          child: TextField(
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-               isDense: true,
-              labelStyle: const TextStyle(color: Colors.white),
-              labelText: 'Search city'.i18n(),
-              border: InputBorder.none,
-              prefixIcon: const Icon(
-                Icons.search,
-                color: Colors.white,
-              ),
-            ),
-            onChanged: (value) async {
-              setState(() {
-                query = value;
-                currentPage = 0;
-                weatherData.clear(); // Clear weather data for new search
-              });
-              // Fetch only visible cities after search
-              await fetchWeatherForCities(_filteredCities);
-            },
+        title:Container(
+  decoration: BoxDecoration(
+    border: Border.all(color: Colors.white.withAlpha(50)),
+    color: Colors.black.withAlpha(100),
+    borderRadius: BorderRadius.circular(10),
+  ),
+  padding: const EdgeInsets.symmetric(horizontal: 8),
+  child: Row(
+    children: [
+      Expanded(
+        child: TextField(
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            isDense: true,
+            labelStyle: const TextStyle(color: Colors.white),
+            labelText: 'Search city'.i18n(),
+            border: InputBorder.none,
+           
           ),
+          onChanged: (value) {
+            query = value; // temp store; submit only on tap
+          },
+          onSubmitted: (value) {
+            setState(() {
+              query = value;
+              weatherData.clear();
+              _pagewiseController.reset();
+            });
+          },
         ),
+      ),
+      IconButton(
+        icon: const Icon(Icons.search,size: 30, color: Colors.white),
+        onPressed: () {
+          setState(() {
+            weatherData.clear();
+            _pagewiseController.reset();
+          });
+        },
+      ),
+    ],
+  ),
+),
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -158,91 +190,91 @@ class _CityWeatherSearchWidgetState extends State<CityWeatherSearchWidget> {
           children: [
             SizedBox(height: kToolbarHeight + dH*.05),
             if (isLoading)
-              const Expanded( // Use Expanded to center loader
+              const Expanded( 
                 child: Center(child: LoaderWidget()),
               )
             else
-              Expanded( // Wrap GridView.builder with Expanded
+              Expanded( 
                 child: Column(
                   children: [
-                    Expanded( // Ensure GridView takes available space
-                      child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                          childAspectRatio: 1,
-                          mainAxisSpacing: 8,
-                          crossAxisSpacing: 16,
-                          maxCrossAxisExtent: dW / 2),
-                        controller: _scrollController,
-                        padding: const EdgeInsets.all(12),
-                        itemCount: visibleCities.length,
-                        itemBuilder: (context, index) {
-                          final city = visibleCities[index];
-                          final data = weatherData[city.name];
-                          final String? weatherIconCode = data != null
-                              ? data['weather'][0]['icon']
-                              : null;
+                 Expanded(
+          child: PagewiseGridView.count(
+        pageLoadController: _pagewiseController,
+        crossAxisCount: (dW / 200).floor(), 
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 16,
+        padding: const EdgeInsets.all(12),
+        itemBuilder: (context, city, index) {
+          final cityData = weatherData[city.name];
+          final weatherIconCode = cityData != null
+              ? cityData['weather'][0]['icon']
+              : null;
+          return GestureDetector(
+        onTap: () {
+          if (cityData != null) {
+            final cwm = CurrentWeatherModel.fromJson(cityData);
+            Navigator.push(context, MaterialPageRoute(
+              builder: (_) => WeatherDetailView(
+                cityName: city.name,
+                tempCelsius: cwm.main!.temp!,
+                feelsLikeCelsius: cwm.main!.feelsLike,
+                weatherDescription: WeatherApiService().getWeatherDescription(cwm) ?? 'N/A',
+                weatherIconUrl: WeatherApiService().getWeatherIconUrl(cwm),
+                windSpeed: WeatherApiService().getWindSpeed(cwm),
+                humidity: WeatherApiService().getHumidity(cwm),
+                pressure: cwm.main?.pressure,
+                latitude: cityData['coord']['lat'],
+                longitude: cityData['coord']['lon'],
+              ),
+            ));
+          }
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 10,
+                blurStyle: BlurStyle.outer,
+                color: Colors.white.withAlpha(40)
+              ),
+            ]
 
-                          return GestureDetector(
-                            onTap: () {
-                              if (data != null) {
-                          CurrentWeatherModel cwm = CurrentWeatherModel.fromJson(data);
-                          Navigator.push(context,MaterialPageRoute(
-                           builder: (_) => WeatherDetailView(
-                            cityName: city.name,
-                            tempCelsius: cwm.main!.temp!,
-                            feelsLikeCelsius: cwm.main!.feelsLike,
-                            weatherDescription: WeatherApiService().getWeatherDescription(cwm) ?? 'N/A',
-                            weatherIconUrl: WeatherApiService().getWeatherIconUrl(cwm),
-                            windSpeed: WeatherApiService().getWindSpeed(cwm),
-                            humidity: WeatherApiService().getHumidity(cwm),
-                            pressure: cwm.main?.pressure,
-                            latitude: data['coord']['lat'],
-                            longitude: data['coord']['lon'],
-                          ),
-                        ),);
-                        }
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                              color: Colors.white.withAlpha(60),
-                              borderRadius: BorderRadius.circular(15)
-                              ),
-                              margin: const EdgeInsets.only(bottom: 12),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  // Use Image.asset if weatherIconCode is available
-                                  if (weatherIconCode != null)
-                                    Image.asset(
-                                      _getWeatherAssetPath(weatherIconCode.toString().replaceAll("n", "d")),
-                                      height: 100,
-                                      fit: BoxFit.contain,
-                                      errorBuilder: (_, __, ___) =>
-                                          const Icon(Icons.cloud, size: 60, color: Colors.white),
-                                    )
-                                  else
-                                    const CircularProgressIndicator(), // Show loading for icon
-                                  if(data != null)
-                                   Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Text(city.name.toString().i18n(), style: w600TS(15,Colors.white)),
-                                        Container(
-                                          margin: EdgeInsets.symmetric(vertical: dH*0.005),
-                                          child: Text('${data['main']['temp'].round()}°C', style: w600TS(14,Colors.white))),
-                                        Text(data['weather'][0]['description'].toString().i18n(), style: w400TS(14, Colors.white)),
-                                      ],
-                                    )
-                                  else
-                                  Text('Loading...'.i18n(), style: TextStyle(color: Colors.white.withAlpha(150)))
-
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+          ),
+          margin: const EdgeInsets.only(bottom: 12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              if (weatherIconCode != null)
+                Image.asset(
+                  _getWeatherAssetPath(weatherIconCode.toString().replaceAll("n", "d")),
+                  height: 60,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => const Icon(Icons.cloud, size: 60, color: Colors.white),
+                )
+              else
+                const CircularProgressIndicator(),
+              if (cityData != null)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(city.name.toString().i18n(), style: w600TS(16, Colors.white)),
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: dH * 0.005),
+                      child: Text('${cityData['main']['temp'].round()}°C', style: w600TS(18, Colors.white)),
                     ),
+                    Text(cityData['weather'][0]['description'].toString().i18n(), style: w400TS(14, Colors.white)),
+                  ],
+                )
+              else
+                Text('Loading...'.i18n(), style: TextStyle(color: Colors.white.withAlpha(150))),
+            ],
+          ),
+        ),
+      );
+    },
+  ),
+),
                     if (isLoadingMore)
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 16),

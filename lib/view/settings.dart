@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:localization/localization.dart';
+import 'package:weather/constants/app_colors.dart';
 import 'package:weather/providers/language_provider.dart';
+import 'package:weather/view/language_selection.dart';
 
 class SettingsView extends ConsumerStatefulWidget {
   const SettingsView({super.key});
@@ -13,8 +15,7 @@ class SettingsView extends ConsumerStatefulWidget {
 class _SettingsViewState extends ConsumerState<SettingsView> {
   @override
   Widget build(BuildContext context) {
-    ref.watch(localeProvider); // her değişimde rebuild
-
+    ref.watch(localeProvider); 
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
@@ -25,104 +26,145 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF000020),
-              Color(0xFF1A2A55),
-              Color(0xFF334F8C),
-            ],
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        decoration: AppGradients.blueGradBG, 
+        child: ListView(
+          padding: const EdgeInsets.all(16),
           children: [
-            SizedBox(height: kToolbarHeight + 20),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: const [
-                  LanguageCard(),
-                ],
-              ),
+            SizedBox(height: kToolbarHeight + 40),
+            _buildSection(
+              context,
+              title: 'General Settings'.i18n(),
+              children: [
+                _buildSettingTile(
+                  context,
+                  icon: Icons.language,
+                  title: 'Language'.i18n(),
+                  subtitle: 'Change application language'.i18n(),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LanguageSelectionView(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            _buildSection(
+              context,
+              title: 'About Us'.i18n(),
+              children: [
+                _buildSettingTile(
+                  context,
+                  icon: Icons.info_outline,
+                  title: 'App Information'.i18n(),
+                  subtitle: 'Version and other information'.i18n(),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text('App Information'.i18n()),
+                        content: Text('Weather App v1.0.0'.i18n()),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text('OK'.i18n()),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
           ],
         ),
       ),
     );
   }
-}
 
-class LanguageCard extends ConsumerWidget {
-  const LanguageCard({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentLocale = ref.watch(localeProvider);
-
+  Widget _buildSection(
+    BuildContext context, {
+    required String title,
+    required List<Widget> children,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          'Select Language'.i18n(),
-          style: const TextStyle(
-            fontSize: 16,
-            color: Colors.white,
-            fontWeight: FontWeight.w400,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Colors.white70, 
+                  fontWeight: FontWeight.w600,
+                ),
           ),
         ),
-        const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
-            color: Colors.black.withAlpha(100),
+            color: Colors.black.withAlpha(100), 
             border: Border.all(color: Colors.white.withAlpha(30)),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(77),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<Locale>(
-              isExpanded: true,
-              value: currentLocale,
-              dropdownColor: Colors.blueGrey.shade900,
-              borderRadius: BorderRadius.circular(10),
-              style: const TextStyle(color: Colors.white),
-              iconEnabledColor: Colors.white,
-              onChanged: (Locale? newValue) {
-                if (newValue != null) {
-                  ref.read(localeProvider.notifier).state = newValue;
-                }
-              },
-              items: supportedLocales.map((Locale locale) {
-                return DropdownMenuItem<Locale>(
-                  value: locale,
-                  child: Text(
-                    _getLanguageDisplayName(locale),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                );
-              }).toList(),
-            ),
+          child: Column(
+            children: children,
           ),
         ),
       ],
     );
   }
 
-  String _getLanguageDisplayName(Locale locale) {
-    switch (locale.languageCode) {
-      case 'en':
-        return 'English';
-      case 'tr':
-        return 'Türkçe';
-      default:
-        return locale.toLanguageTag();
-    }
+  Widget _buildSettingTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.blue.withAlpha(50),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(
+          icon,
+          color: Colors.blue,
+          size: 24,
+        ),
+      ),
+      title: Text(
+        title,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.white70,
+            ),
+      ),
+      trailing: const Icon(
+        Icons.chevron_right,
+        color: Colors.white70,
+      ),
+      onTap: onTap,
+    );
   }
 }

@@ -66,5 +66,13 @@
     "Istanbul (Asian Side)" : "Istanbul (Anadolu)",
     "Latitude": "Enlem",
     "Longitude": "Boylam",
-    "Location services are disabled. Please enable them." : "Konum servisleri devre dışı,lütfen etkinleştiriniz."
+    "Location services are disabled. Please enable them." : "Konum servisleri devre dışı,lütfen etkinleştiriniz.",
+    "General Settings": "Genel Ayarlar",
+    "Language": "Dil",
+    "Change application language": "Uygulama dilini değiştir",
+    "About Us": "Hakkımızda",
+    "App Information": "Uygulama Bilgileri",
+    "Version and other information": "Sürüm ve diğer bilgiler",
+    "OK": "Tamam",
+    "Select a language": "Dil Seçimi"
 }

@@ -89,10 +89,7 @@ class WeatherNotifier extends StateNotifier<WeatherState> {
   }
 
 Future<void> fetchCurrentLocationWeather(BuildContext context, WidgetRef ref) async {
-  // Start loading
   state = state.copyWith(isLoading: true, errorMessage: null, locationName: 'Current Location');
-
-  // Check if location services are enabled
   final isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
   if (!isLocationServiceEnabled) {
     state = state.copyWith(

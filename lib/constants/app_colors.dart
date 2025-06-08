@@ -31,4 +31,15 @@ class AppGradients {
       Color(0xFFE94057), // Reddish Orange
     ],
   );
+  static BoxDecoration blueGradBG  = BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF000020),
+              Color(0xFF1A2A55),
+              Color(0xFF334F8C),
+            ],
+          ), 
+          );
 }

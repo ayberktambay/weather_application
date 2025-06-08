@@ -75,7 +75,9 @@ Widget build(BuildContext context) {
     ),
   );
 }
-
+ String _getWeatherAssetPath(String iconCode) {
+    return 'assets/weather_icons/$iconCode.png';
+  }
 Widget _buildWeatherDisplay(Size size, CurrentWeatherModel? weatherModel, WeatherState state) {
   final screenWidth = size.width;
   final isTablet = screenWidth > 600;
@@ -83,9 +85,9 @@ Widget _buildWeatherDisplay(Size size, CurrentWeatherModel? weatherModel, Weathe
   final num? tempCelsius = WeatherApiService().getTemperatureCelsius(weatherModel);
   final num? feelsLikeCelsius = WeatherApiService().getFeelsLikeCelsius(weatherModel);
   final String weatherDescription = WeatherApiService().getWeatherDescription(weatherModel) ?? 'N/A';
-  final String? weatherIconUrl = WeatherApiService().getWeatherIconUrl(weatherModel);
   final num? windSpeed = WeatherApiService().getWindSpeed(weatherModel);
   final num? humidity = WeatherApiService().getHumidity(weatherModel);
+  final weatherIconCode = weatherModel!.weather!.first.icon;
 
   return Padding(
     padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05, vertical: 20),
@@ -96,8 +98,13 @@ Widget _buildWeatherDisplay(Size size, CurrentWeatherModel? weatherModel, Weathe
         const SizedBox(height: 10),
         Text(cityName, style: TextStyle(fontSize: isTablet ? 42 : 32, fontWeight: FontWeight.bold, color: Colors.white)),
         const SizedBox(height: 10),
-        if (weatherIconUrl != null)
-          Image.network(weatherIconUrl, width: isTablet ? 160 : screenWidth * 0.3),
+        if (weatherIconCode != null)
+           Image.asset(
+                  _getWeatherAssetPath(weatherIconCode.toString().replaceAll("n", "d")),
+                  height: 100,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => const Icon(Icons.cloud, size: 60, color: Colors.white),
+                ),
         Text(weatherDescription.i18n().toUpperCase(), style: TextStyle(fontSize: isTablet ? 20 : 16, color: Colors.white)),
         const SizedBox(height: 20),
         Text(tempCelsius != null ? '${tempCelsius.toStringAsFixed(0)}°C' : 'N/A',
@@ -122,7 +129,7 @@ Widget _buildWeatherDisplay(Size size, CurrentWeatherModel? weatherModel, Weathe
               const Divider(color: Colors.white54),
               _buildDetailRow(icon: Icons.opacity, label: 'Humidity'.i18n(), value: humidity != null ? '$humidity%' : 'N/A'),
               const Divider(color: Colors.white54),
-              _buildDetailRow(icon: Icons.compress, label: 'Pressure'.i18n(), value: weatherModel?.main?.pressure != null ? '${weatherModel!.main!.pressure!.toInt()} hPa' : 'N/A'),
+              _buildDetailRow(icon: Icons.compress, label: 'Pressure'.i18n(), value: weatherModel.main?.pressure != null ? '${weatherModel.main!.pressure!.toInt()} hPa' : 'N/A'),
               const Divider(color: Colors.white54),
               _buildDetailRow(icon: Icons.location_on, label: 'Lat/Lon'.i18n(), value: '${state.lat.toStringAsFixed(2)}, ${state.lon.toStringAsFixed(2)}'),
             ],
