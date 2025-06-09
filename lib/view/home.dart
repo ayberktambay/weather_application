@@ -7,7 +7,6 @@ import 'package:weather/service/weather_service.dart';
 import 'package:weather/providers/theme_provider.dart';
 import 'package:weather/view/utils/clock.dart';
 import 'package:weather/view/utils/loader.dart';
-
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
 

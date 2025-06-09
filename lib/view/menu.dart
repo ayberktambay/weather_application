@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:localization/localization.dart';
 import 'package:weather/providers/language_provider.dart';
 import 'package:weather/view/home.dart';
 import 'package:weather/view/search.dart';
@@ -21,29 +20,74 @@ class _MenuViewState extends ConsumerState<MenuView> {
     ref.watch(localeProvider);
 
     List<NavItems> navItems = [
-      NavItems(0, "Home", const Icon(Icons.home_outlined), const Icon(Icons.home), const HomeView()),
-      NavItems(1, "Search", const Icon(Icons.search_outlined), const Icon(Icons.search), const CityWeatherSearchWidget()),
-      NavItems(2, "Settings", const Icon(Icons.settings_outlined), const Icon(Icons.settings), const SettingsView()),
+      NavItems(0, "Home",  const HomeView()),
+      NavItems(1, "Settings", const SettingsView()),
+      NavItems(2, "Search", const CityWeatherSearchWidget()),
     ];
 
     return Scaffold(
+      backgroundColor:  const Color.fromARGB(255, 53, 76, 126),
+        floatingActionButton: Container(
+          decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(360),
+            gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+           Colors.white,
+           const Color.fromARGB(255, 230, 230, 230),
+            ],
+          ), 
+         ), 
+                  child: IconButton(
+                          onPressed: (){
+                            currentIndex = 2;
+                            setState(() { });
+                          },
+                          icon: const Icon(Icons.search,size: 30,color:  Color.fromARGB(255, 9, 37, 112),),
+                        ),
+      ),
+      extendBodyBehindAppBar: false,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       body: navItems[currentIndex].path,
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color.fromARGB(255, 30, 53, 104),
-        selectedItemColor: Colors.white,
-        unselectedItemColor: const Color.fromARGB(255, 113, 138, 150),
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        items: navItems.map((e) => BottomNavigationBarItem(
-          icon: e.disabledIcon!,
-          activeIcon: e.activeIcon!,
-          label: e.name!.i18n(), 
-        )).toList(),
-        currentIndex: currentIndex,
-        onTap: (value) {
-          currentIndex = value;
-          setState(() {});
-        },
+      bottomNavigationBar: BottomAppBar(
+                padding: const EdgeInsets.all(4),
+                color: const Color.fromARGB(255, 30, 53, 104),
+              shape: const CircularNotchedRectangle(),
+              notchMargin: 2.0,
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  IconButton(
+                    icon: Column(
+                      children: [
+                        Icon(currentIndex == 0 ? Icons.home : Icons.home_outlined,size: 30,color: Colors.white,),
+                    
+                      ],
+                    ),
+                    onPressed: () {
+                      setState(() { currentIndex = 0;});
+                      },
+                  ),
+                
+                  const SizedBox(width: 48.0), 
+                    IconButton(
+                    icon: Column(
+                      children: [
+                        Icon(currentIndex == 1 ? Icons.settings : Icons.settings_outlined,size:30,color: Colors.white,),
+                      
+                      ],
+                    ),
+                    onPressed: () {
+                      currentIndex = 1;
+                      setState(() {});
+                      },
+                  ),
+               
+                ],
+              ),
       ),
     );
   }
@@ -52,9 +96,7 @@ class _MenuViewState extends ConsumerState<MenuView> {
 class NavItems {
   int index;
   String? name;
-  Icon? disabledIcon;
-  Icon? activeIcon;
   Widget path;
 
-  NavItems(this.index, this.name, this.disabledIcon, this.activeIcon, this.path);
+  NavItems(this.index, this.name,this.path);
 }

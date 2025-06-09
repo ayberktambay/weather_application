@@ -21,20 +21,20 @@ class LanguageSelectionView extends ConsumerWidget {
         ),
         title: Text(
           "Select a language".i18n(),
-          style: w500TS(16, Colors.white),
+          style: w500TS(18, Colors.white),
         ),
       ),
       extendBody: true,
       extendBodyBehindAppBar: true,
       body: Container(
-        decoration: AppGradients.blueGradBG, // Mevcut arka plan gradyanı
+        decoration: AppGradients.blueGradBG,
         child: Consumer(
           builder: (context, ref, child) {
             final currentLocale = ref.watch(localeProvider);
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                const SizedBox(height: kToolbarHeight + 20), // AppBar yüksekliği kadar boşluk
+                const SizedBox(height: kToolbarHeight + 40),
                 _buildLanguageOption(
                   context,
                   title: 'Türkçe',
@@ -42,7 +42,6 @@ class LanguageSelectionView extends ConsumerWidget {
                   isSelected: currentLocale.languageCode == 'tr',
                   onTap: () {
                     ref.read(localeProvider.notifier).state = const Locale('tr');
-                    // Navigator.pop(context); // Dil değişince geri gitmek istenirse
                   },
                 ),
                 const SizedBox(height: 12),
@@ -53,10 +52,8 @@ class LanguageSelectionView extends ConsumerWidget {
                   isSelected: currentLocale.languageCode == 'en',
                   onTap: () {
                     ref.read(localeProvider.notifier).state = const Locale('en');
-                    // Navigator.pop(context); // Dil değişince geri gitmek istenirse
                   },
                 ),
-                // Diğer diller buraya eklenebilir
               ],
             );
           },
@@ -73,9 +70,9 @@ class LanguageSelectionView extends ConsumerWidget {
     required VoidCallback onTap,
   }) {
     return Card(
-      color: Colors.black.withAlpha(100), // Arka plan şeffaf siyah
+      color: Colors.black.withAlpha(100), 
       elevation: 2,
-      shadowColor: Colors.black.withOpacity(0.5),
+      shadowColor: Colors.black.withAlpha(125),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
         side: BorderSide(color: Colors.white.withAlpha(30)),
@@ -85,7 +82,7 @@ class LanguageSelectionView extends ConsumerWidget {
           title,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? Colors.green : Colors.white,
+                color: isSelected ? Colors.blue : Colors.white,
               ),
         ),
         subtitle: Text(
@@ -97,7 +94,7 @@ class LanguageSelectionView extends ConsumerWidget {
         trailing: isSelected
             ? const Icon(
                 Icons.check_circle,
-                color: Colors.green,
+                color: Colors.blue,
               )
             : null,
         onTap: onTap,

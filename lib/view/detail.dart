@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
+import 'package:weather/utils/util_functions.dart';
 
 class WeatherDetailView extends StatelessWidget {
   final String cityName;
   final num? tempCelsius;
   final num? feelsLikeCelsius;
   final String weatherDescription;
-  final String? weatherIconUrl;
+  final String? weatherIconCode;
   final num? windSpeed;
   final num? humidity;
   final num? pressure;
@@ -19,7 +20,7 @@ class WeatherDetailView extends StatelessWidget {
     required this.tempCelsius,
     required this.feelsLikeCelsius,
     required this.weatherDescription,
-    required this.weatherIconUrl,
+    required this.weatherIconCode,
     required this.windSpeed,
     required this.humidity,
     required this.pressure,
@@ -54,14 +55,12 @@ class WeatherDetailView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              if (weatherIconUrl != null)
-                Image.network(
-                  weatherIconUrl!,
-                  width: 100,
+             if (weatherIconCode != null)
+                Image.asset(
+                  UtilFunctions.getWeatherAssetPath(weatherIconCode.toString().replaceAll("n", "d")),
                   height: 100,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      const Icon(Icons.cloud, size: 60, color: Colors.white),
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => const Icon(Icons.cloud, size: 60, color: Colors.white),
                 ),
               const SizedBox(height: 20),
               Text(

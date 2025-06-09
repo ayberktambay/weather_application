@@ -10,6 +10,7 @@ import 'dart:convert';
 
 import 'package:weather/service/app_config_service.dart';
 import 'package:weather/service/weather_service.dart';
+import 'package:weather/utils/util_functions.dart';
 import 'package:weather/view/detail.dart';
 import 'package:weather/view/utils/loader.dart';
 
@@ -22,7 +23,6 @@ class CityWeatherSearchWidget extends StatefulWidget {
 }
 
 class _CityWeatherSearchWidgetState extends State<CityWeatherSearchWidget> {
-  String query = '';
   Map<String, dynamic> weatherData = {};
   bool isLoading = false;
   bool isLoadingMore = false;
@@ -30,20 +30,18 @@ class _CityWeatherSearchWidgetState extends State<CityWeatherSearchWidget> {
   final int pageSize = 6;
   late ScrollController _scrollController;
 late PagewiseLoadController<City> _pagewiseController;
-
+  TextEditingController searchController = TextEditingController();
   List<City> get _filteredCities {
-    final filtered = query.isEmpty
+    final filtered = searchController.text.isEmpty
         ? cities
         : cities
             .where((city) =>
-                city.name.toLowerCase().contains(query.toLowerCase()))
+                city.name.toLowerCase().contains(searchController.text.toLowerCase()))
             .toList();
     return filtered.take((currentPage + 1) * pageSize).toList();
   }
 
-  String _getWeatherAssetPath(String iconCode) {
-    return 'assets/weather_icons/$iconCode.png';
-  }
+ 
 
   Future<void> fetchWeatherForCities(List<City> citiesToFetch) async {
     final String apiKey = AppConfigService().openWeatherApiKey!;
@@ -113,10 +111,10 @@ late PagewiseLoadController<City> _pagewiseController;
     super.dispose();
   }
 Future<List<City>> _getPage(int? pageIndex) async {
-  final allFiltered = query.isEmpty
+  final allFiltered = searchController.text.isEmpty
       ? cities
       : cities
-          .where((city) => city.name.toLowerCase().contains(query.toLowerCase()))
+          .where((city) => city.name.toLowerCase().contains(searchController.text.toLowerCase()))
           .toList();
 
   final start = (pageIndex ?? 0) * pageSize;
@@ -127,11 +125,11 @@ Future<List<City>> _getPage(int? pageIndex) async {
 
   return pageCities;
 }
+bool isSearched = false;
   @override
   Widget build(BuildContext context) {
     var dW = MediaQuery.sizeOf(context).width;
     var dH = MediaQuery.sizeOf(context).height;
-
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
@@ -150,19 +148,19 @@ Future<List<City>> _getPage(int? pageIndex) async {
       Expanded(
         child: TextField(
           style: const TextStyle(color: Colors.white),
+          controller: searchController,
           decoration: InputDecoration(
             isDense: true,
             labelStyle: const TextStyle(color: Colors.white),
             labelText: 'Search city'.i18n(),
             border: InputBorder.none,
-           
           ),
           onChanged: (value) {
-            query = value; // temp store; submit only on tap
+            searchController.text = value; 
           },
           onSubmitted: (value) {
             setState(() {
-              query = value;
+              searchController.text = value;
               weatherData.clear();
               _pagewiseController.reset();
             });
@@ -170,11 +168,15 @@ Future<List<City>> _getPage(int? pageIndex) async {
         ),
       ),
       IconButton(
-        icon: const Icon(Icons.search,size: 30, color: Colors.white),
+        icon:  Icon(isSearched ? Icons.close : Icons.search,size: 30, color: Colors.white),
         onPressed: () {
           setState(() {
+            if(isSearched){
+            searchController.clear();
+            }
             weatherData.clear();
             _pagewiseController.reset();
+            isSearched = !isSearched;
           });
         },
       ),
@@ -198,87 +200,87 @@ Future<List<City>> _getPage(int? pageIndex) async {
                 child: Column(
                   children: [
                  Expanded(
-          child: PagewiseGridView.count(
-        pageLoadController: _pagewiseController,
-        crossAxisCount: (dW / 200).floor(), 
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 16,
-        padding: const EdgeInsets.all(12),
-        itemBuilder: (context, city, index) {
-          final cityData = weatherData[city.name];
-          final weatherIconCode = cityData != null
-              ? cityData['weather'][0]['icon']
-              : null;
-          return GestureDetector(
-        onTap: () {
-          if (cityData != null) {
-            final cwm = CurrentWeatherModel.fromJson(cityData);
-            Navigator.push(context, MaterialPageRoute(
-              builder: (_) => WeatherDetailView(
-                cityName: city.name,
-                tempCelsius: cwm.main!.temp!,
-                feelsLikeCelsius: cwm.main!.feelsLike,
-                weatherDescription: WeatherApiService().getWeatherDescription(cwm) ?? 'N/A',
-                weatherIconUrl: WeatherApiService().getWeatherIconUrl(cwm),
-                windSpeed: WeatherApiService().getWindSpeed(cwm),
-                humidity: WeatherApiService().getHumidity(cwm),
-                pressure: cwm.main?.pressure,
-                latitude: cityData['coord']['lat'],
-                longitude: cityData['coord']['lon'],
-              ),
-            ));
-          }
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 10,
-                blurStyle: BlurStyle.outer,
-                color: Colors.white.withAlpha(40)
-              ),
-            ]
-
-          ),
-          margin: const EdgeInsets.only(bottom: 12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              if (weatherIconCode != null)
-                Image.asset(
-                  _getWeatherAssetPath(weatherIconCode.toString().replaceAll("n", "d")),
-                  height: 60,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const Icon(Icons.cloud, size: 60, color: Colors.white),
-                )
-              else
-                const CircularProgressIndicator(),
-              if (cityData != null)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(city.name.toString().i18n(), style: w600TS(16, Colors.white)),
-                    Container(
-                      margin: EdgeInsets.symmetric(vertical: dH * 0.005),
-                      child: Text('${cityData['main']['temp'].round()}°C', style: w600TS(18, Colors.white)),
-                    ),
-                    Text(cityData['weather'][0]['description'].toString().i18n(), style: w400TS(14, Colors.white)),
-                  ],
-                )
-              else
-                Text('Loading...'.i18n(), style: TextStyle(color: Colors.white.withAlpha(150))),
-            ],
-          ),
-        ),
-      );
-    },
-  ),
-),
+                   child: PagewiseGridView.count(
+                    loadingBuilder: (context) {
+                     return LoaderWidget();
+                    },
+                   pageLoadController: _pagewiseController,
+                   crossAxisCount: (dW / 200).floor(), 
+                   mainAxisSpacing: 8,
+                   crossAxisSpacing: 16,
+                   padding: const EdgeInsets.all(12),
+                   itemBuilder: (context, city, index) {
+                   final cityData = weatherData[city.name];
+                   final weatherIconCode = cityData != null
+                       ? cityData['weather'][0]['icon']
+                       : null;
+                   return GestureDetector(
+                                              onTap: () {
+                   if (cityData != null) {
+                     final cwm = CurrentWeatherModel.fromJson(cityData);
+                     Navigator.push(context, MaterialPageRoute(
+                       builder: (_) => WeatherDetailView(
+                         cityName: city.name,
+                         tempCelsius: cwm.main!.temp!,
+                         feelsLikeCelsius: cwm.main!.feelsLike,
+                         weatherDescription: WeatherApiService().getWeatherDescription(cwm) ?? 'N/A',
+                         weatherIconCode: weatherIconCode,
+                         windSpeed: WeatherApiService().getWindSpeed(cwm),
+                         humidity: WeatherApiService().getHumidity(cwm),
+                         pressure: cwm.main?.pressure,
+                         latitude: cityData['coord']['lat'],
+                         longitude: cityData['coord']['lon'],
+                       ),
+                     ));
+                   }
+                                              },
+                                              child: Container(
+                   decoration: BoxDecoration(
+                     borderRadius: BorderRadius.circular(15),
+                     gradient: LinearGradient(
+                      begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                      colors: [Colors.white.withAlpha(40),Colors.white.withAlpha(20)]
+                      ),
+                   ),
+                   margin: const EdgeInsets.only(bottom: 12),
+                   child: Column(
+                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                     children: [
+                   
+                         Image.asset(
+                         UtilFunctions.getWeatherAssetPath(weatherIconCode.toString().replaceAll("n", "d")),
+                         height: 50,
+                         fit: BoxFit.contain,
+                         errorBuilder: (_, __, ___) => const Icon(Icons.question_mark_rounded, size: 50, color: Colors.white),
+                         ),
+                       if (cityData != null)
+                         Column(
+                                       crossAxisAlignment: CrossAxisAlignment.center,
+                                       children: [
+                                         Text(city.name.toString().i18n(), style: w600TS(16, Colors.white)),
+                                         Container(
+                                           margin: EdgeInsets.symmetric(vertical: dH * 0.005),
+                                           child: Text('${cityData['main']['temp'].round()}°C', style: w600TS(18, Colors.white)),
+                                         ),
+                                         Text(cityData['weather'][0]['description'].toString().i18n(), style: w500TS(16, Colors.white)),
+                                       ],
+                         )
+                       else
+                         Text('Loading...'.i18n(), style: TextStyle(color: Colors.white.withAlpha(150))),
+                     ],
+                   ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                 ),
                     if (isLoadingMore)
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Center(child: CircularProgressIndicator()),
+                        child: Center(child: CircularProgressIndicator(
+                          color: Colors.red,
+                          backgroundColor: Colors.white,
+                        )),
                       ),
                   ],
                 ),

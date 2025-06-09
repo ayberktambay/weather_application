@@ -66,7 +66,7 @@ class WeatherNotifier extends StateNotifier<WeatherState> {
   final WeatherApiService _weatherApiService;
 
   WeatherNotifier(this._weatherApiService) : super(WeatherState()) {
-    fetchWeather(state.lat, state.lon);
+   // fetchWeather(state.lat, state.lon);
     loadMoreCities(); // İlk sayfa yüklenir
   }
 

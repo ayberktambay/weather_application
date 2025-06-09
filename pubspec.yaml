@@ -15,7 +15,7 @@ dependencies:
   flutter_localization: ^0.3.2
   localization:
   flutter_pagewise: ^2.0.4
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
