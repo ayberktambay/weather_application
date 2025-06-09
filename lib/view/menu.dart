@@ -52,10 +52,9 @@ class _MenuViewState extends ConsumerState<MenuView> {
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       body: navItems[currentIndex].path,
       bottomNavigationBar: BottomAppBar(
-                padding: const EdgeInsets.all(4),
-                color: const Color.fromARGB(255, 30, 53, 104),
+                color: const Color.fromARGB(255, 1, 1, 17),
               shape: const CircularNotchedRectangle(),
-              notchMargin: 2.0,
+              notchMargin: 10.0,
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -63,7 +62,7 @@ class _MenuViewState extends ConsumerState<MenuView> {
                   IconButton(
                     icon: Column(
                       children: [
-                        Icon(currentIndex == 0 ? Icons.home : Icons.home_outlined,size: 30,color: Colors.white,),
+                        Icon(currentIndex == 0 ? Icons.home : Icons.home_outlined,size: 30,color: const Color.fromARGB(255, 240, 240, 240),),
                     
                       ],
                     ),
@@ -76,7 +75,7 @@ class _MenuViewState extends ConsumerState<MenuView> {
                     IconButton(
                     icon: Column(
                       children: [
-                        Icon(currentIndex == 1 ? Icons.settings : Icons.settings_outlined,size:30,color: Colors.white,),
+                        Icon(currentIndex == 1 ? Icons.settings : Icons.settings_outlined,size:30,color: const Color.fromARGB(255, 240, 240, 240),),
                       
                       ],
                     ),

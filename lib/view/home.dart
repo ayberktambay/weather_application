@@ -45,29 +45,18 @@ Widget build(BuildContext context) {
 
   return Scaffold(
     extendBodyBehindAppBar: true,
-    body: Container(
+    body: 
+    Container(
       height: screenSize.height,
       width: screenSize.width,
       decoration: BoxDecoration(gradient: currentGradient),
-      child: weatherState.isLoading
-          ? LoaderWidget()
-          : weatherState.errorMessage != null
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      weatherState.errorMessage!,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.white, fontSize: 18),
-                    ),
-                  ),
-                )
-              : RefreshIndicator(
+      child:  RefreshIndicator(
                   onRefresh: () async {
                     await ref.read(weatherProvider.notifier).fetchCurrentLocationWeather(context,ref);
                   },
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
+                  child: 
+                  weatherModel == null ? Center(child: CircularProgressIndicator()) :
+                  SingleChildScrollView(
                     child: _buildWeatherDisplay(screenSize, weatherModel, weatherState),
                   ),
                 ),

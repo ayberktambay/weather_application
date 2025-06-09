@@ -15,6 +15,7 @@ class SettingsView extends ConsumerStatefulWidget {
 class _SettingsViewState extends ConsumerState<SettingsView> {
   @override
   Widget build(BuildContext context) {
+    var dH = MediaQuery.sizeOf(context).height;
     ref.watch(localeProvider); 
     return Scaffold(
       extendBody: true,
@@ -35,7 +36,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            SizedBox(height: kToolbarHeight + 40),
+            SizedBox(height: kToolbarHeight + dH*0.01),
             _buildSection(
               context,
               title: 'General Settings'.i18n(),

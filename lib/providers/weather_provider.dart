@@ -110,7 +110,6 @@ Future<void> fetchCurrentLocationWeather(BuildContext context, WidgetRef ref) as
     return;
   }
 
-  // Try to get current position and fetch weather
   try {
     final position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.best,
